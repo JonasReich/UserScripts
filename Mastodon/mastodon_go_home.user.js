@@ -6,8 +6,8 @@
 // @author       Jonas Reich
 // @match        *://*/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=mastodon.social
-// @updateURL    https://raw.github.com/JonasReich/UserScripts/main/Mastodon/mastodon_go_home.user.js
-// @downloadURL  https://raw.github.com/JonasReich/UserScripts/main/Mastodon/mastodon_go_home.user.js
+// @updateURL    https://github.com/JonasReich/UserScripts/raw/main/Mastodon/mastodon_go_home.user.js
+// @downloadURL  https://github.com/JonasReich/UserScripts/raw/main/Mastodon/mastodon_go_home.user.js
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js
 // @require      https://gist.github.com/raw/2625891/waitForKeyElements.js
 // @grant        GM_addStyle
