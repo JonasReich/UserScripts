@@ -7,7 +7,7 @@
 // @match        https://trello.com/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=trello.com
 // @updateURL    https://github.com/JonasReich/UserScripts/raw/main/Trello/trello_style.user.js
-// @downloadURL  https://github.com/JonasReich/UserScripts/raw/main/Trello/trello_style.user.js
+// @downloadURL    https://github.com/JonasReich/UserScripts/raw/main/Trello/trello_style.user.js
 // @grant        GM_addStyle
 // ==/UserScript==
 
@@ -34,11 +34,16 @@
         left: 5px;
     }
     #board:not(.board-table-view) .list-hidden .list-header-name-assist {
-        margin-top: 50px;
+        margin-top: 100px;
     }
     .list-card.is-covered .list-card-cover {
         background-size: contain !important;
         max-height: 100px;
+    }
+    #board:not(.board-table-view) .list-hidden .list-header-extras-limit-badge {
+        padding: 8px 2px;
+        margin-left: 3px;
+        margin-bottom: 3px;
     }
     `);
 
@@ -48,7 +53,11 @@
     `);
 
     // Make member list on card more compact
-    GM_addStyle(".list-card-members .member{margin-right: -15px; right: 15px;}");
+    GM_addStyle(`
+    .list-card-members .member{margin-right: -15px; right: 15px;}
+    .badges {width: 90%;}
+    .list-card .list-card-details { align-items: flex-end; }
+    `);
 
     // Make card details window bigger (useful on 1440k and bigger monitors)
     GM_addStyle ( `
