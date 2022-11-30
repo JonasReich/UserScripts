@@ -7,7 +7,7 @@
 // @match        https://trello.com/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=trello.com
 // @updateURL    https://github.com/JonasReich/UserScripts/raw/main/Trello/trello_style.user.js
-// @updateURL    https://github.com/JonasReich/UserScripts/raw/main/Trello/trello_style.user.js
+// @downloadURL  https://github.com/JonasReich/UserScripts/raw/main/Trello/trello_style.user.js
 // @grant        GM_addStyle
 // ==/UserScript==
 
