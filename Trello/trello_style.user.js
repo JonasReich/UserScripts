@@ -14,21 +14,41 @@
 (function() {
     'use strict';
 
-    // Make collapsed strelloids lists smaller
     // Modifies divs created by this extension: https://addons.mozilla.org/en-US/firefox/addon/strelloids/
+    // Make collapsed lists smaller
+    // Make compatible with column limits
+    // Make lists wider than default -> change images to contain instead of cover
     GM_addStyle ( `
     .list-wrapper {
+        width: 350px;
+    }
+    .js-add-list.list-wrapper.mod-add.is-idle {
+        width: max-content;
+    }
+    .list-wrapper.list-hidden {
         height: inherit;
-        width: 390px;
     }
     .list-card { max-width: none; }
     #board:not(.board-table-view) .list-hidden .list-header .list-header-extras {
         top: 30px;
+        left: 5px;
     }
     #board:not(.board-table-view) .list-hidden .list-header-name-assist {
         margin-top: 50px;
     }
+    .list-card.is-covered .list-card-cover {
+        background-size: contain !important;
+        max-height: 100px;
+    }
     `);
+
+    // Hide unwanted buttons from card edit window
+    GM_addStyle ( `
+    .button-link.js-edit-location { display: none; }
+    `);
+
+    // Make member list on card more compact
+    GM_addStyle(".list-card-members .member{margin-right: -15px; right: 15px;}");
 
     // Make card details window bigger (useful on 1440k and bigger monitors)
     GM_addStyle ( `
@@ -36,6 +56,21 @@
 	.window-main-col { width: 68%; padding: 0 1% 1% 2%; }
 	.window-sidebar { width: 25%; }
 	.small-window .window-sidebar { position: static; }
-    .button-link, .card-detail-window .button-link-container { max-width: none; }
+    .button-link, .card-detail-window .button-link-container {
+        max-width: none;
+        width: 45%;
+        display: inline-block;
+        margin: 5px;
+        padding: 5px;
+    }
+    .js-butler-card-buttons .u-clearfix .u-clearfix div {
+        display: inline;
+    }
+    .checklist-item-details .checklist-item-row .checklist-item-text-and-controls {
+        padding: 2px 0px;
+    }
+    .window-module, .checklist {
+        margin-bottom:0;
+    }
     `);
 })();
