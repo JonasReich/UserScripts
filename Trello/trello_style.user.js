@@ -69,8 +69,7 @@
         max-width: none;
         width: 45%;
         display: inline-block;
-        margin: 5px;
-        padding: 5px;
+        margin: 1px;
     }
     .js-butler-card-buttons .u-clearfix .u-clearfix div {
         display: inline;
