@@ -49,7 +49,7 @@
 
     // Hide strelloids card counter no matter the setting (it's a bit buggy)
     // Reccommendation: Use column limits instead.
-    GM_addStyle(`list-header-num-cards js-num-cards{display:none;}`);
+    GM_addStyle(`.list-header-num-cards .js-num-cards{display:none;}`);
 
     // Hide unwanted buttons from card edit window
     GM_addStyle ( `
