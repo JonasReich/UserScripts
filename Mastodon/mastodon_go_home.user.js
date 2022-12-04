@@ -107,21 +107,7 @@ function injectButtonAfter(elment_class){
     inject_button.onclick = function(){ gotoMyInstance(); }
 }
 
-// vanilla JS equivalent of $('document').ready(function(){});
-// see https://stackoverflow.com/a/9899701
-function docReady(fn) {
-    // see if DOM is already available
-    if (document.readyState === "complete" || document.readyState === "interactive") {
-        // call on next available tick
-        setTimeout(fn, 1);
-    } else {
-        document.addEventListener("DOMContentLoaded", fn);
-    }
-}
-
-docReady(function() {
-    // DOM is loaded and ready for manipulation here
-
+$('document').ready(function() {
     let masto_root = $("#mastodon");
     if (masto_root.length != 1) {
         // Do not enable on non-mastodon pages (only works from v4.0 onwards)
