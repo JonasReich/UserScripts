@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Mastodon - Go Home
 // @namespace    https://github.com/JonasReich/
-// @version      0.1
+// @version      0.2
 // @description  Inject a "Go Home" button into all mastodon pages that redirects you to the mastodon instance in gamedev.place
 // @author       Jonas Reich
 // @match        *://*/*
