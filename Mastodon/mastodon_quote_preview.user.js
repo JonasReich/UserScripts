@@ -72,9 +72,9 @@ function addPostPreview(link){
                     </div>`;
                     $(quote_status).append(`<div class="status-card__content">${title_html}${status.content}${status_meta_html}</div></a>`);
 
-                    // Remove all other links to this post from the same post containing the link.
-                    // Also prevent accidentally filtering out quotes.
-                    $(link).parents(".detailed-status").not(".quote-status").find("a").each(function(){
+                    // Remove all copies of the link from the same post containing the new post quote.
+                    // Also prevent accidentally filtering out the quote itself.
+                    $(link).parents(".status, .detailed-status").not(".quote-status").find("a").each(function(){
                         if ($(this).prop("href") == url) {
                             $(this).remove();
                         }
