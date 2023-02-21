@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          Trello Style (Jonas Reich)
 // @namespace     https://github.com/JonasReich/
-// @version       0.1
+// @version       0.2
 // @description   Style Adjustments for Trello
 // @author        Jonas Reich
 // @match         https://trello.com/*
