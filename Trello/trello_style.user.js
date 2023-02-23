@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          Trello Style (Jonas Reich)
 // @namespace     https://github.com/JonasReich/
-// @version       0.2
+// @version       0.2.1
 // @description   Style Adjustments for Trello
 // @author        Jonas Reich
 // @match         https://trello.com/*
@@ -72,7 +72,7 @@
     .window-main-col { width: 68%; padding: 0 1% 1% 2%; }
     .window-sidebar { width: 25%; }
     .small-window .window-sidebar { position: static; }
-    .button-link, .card-detail-window .button-link-container {
+    .window-sidebar .button-link, .card-detail-window .button-link-container {
         max-width: none;
         width: 45%;
         display: inline-block;
