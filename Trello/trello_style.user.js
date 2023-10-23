@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          Trello Style (Jonas Reich)
 // @namespace     https://github.com/JonasReich/
-// @version       0.3.0
+// @version       0.3.1
 // @description   Style Adjustments for Trello
 // @author        Jonas Reich
 // @match         https://trello.com/*
@@ -27,7 +27,7 @@ function replaceSeparatorsTick()
         var str = $(this).contents().filter(function() {
             // only the immediate text. There are some hidden text elements (invisible card ID text) that we need to ignore.
             return this.nodeType == Node.TEXT_NODE;
-        }).text().replace(divider_string, "");
+        }).text().replace(separator_string, "");
         $(this).text(str);
     });
 }
