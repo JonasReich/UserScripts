@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          Trello Style (Jonas Reich)
 // @namespace     https://github.com/JonasReich/
-// @version       0.3.1
+// @version       0.3.2
 // @description   Style Adjustments for Trello
 // @author        Jonas Reich
 // @match         https://trello.com/*
@@ -21,6 +21,7 @@ function replaceSeparatorsTick()
     $(cards).find(".list-card-title:contains('done')").css("--card-separator-color", "#55b755"); // some shade of green
     $(cards).find(".list-card-title:contains('todo')").css("--card-separator-color", "grey");
     $(cards).find(".list-card-title:contains('started')").css("--card-separator-color", "#5050f7"); // some shade of blue
+    $(cards).find(".list-card-title:contains('in progress')").css("--card-separator-color", "#5050f7"); // some shade of blue
 
     dividers_card_titles.closest(".list-card").addClass("card-separator");
     dividers_card_titles.each(function() {
