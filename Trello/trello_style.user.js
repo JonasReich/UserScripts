@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          Trello Style (Grimlore)
 // @namespace     https://github.com/JonasReich/
-// @version       0.4.0
+// @version       0.4.1
 // @description   Style Adjustments for Trello (for work at Grimlore)
 // @author        Jonas Reich
 // @match         https://trello.com/*
@@ -21,10 +21,10 @@ function replaceSeparatorsTick()
     let separator_string = "---";
     let dividers_card_titles = $(`.list-card-title:contains('${separator_string}')`);
     let cards = dividers_card_titles.closest(".list-card");
-    $(cards).find(".list-card-title:contains('done')").css("--card-separator-color", "#55b755").closest(".list-card").addClass("js-card-separator-done"); // some shade of green
-    $(cards).find(".list-card-title:contains('todo')").css("--card-separator-color", "grey").closest(".list-card").addClass("js-card-separator-todo");
-    $(cards).find(".list-card-title:contains('started')").css("--card-separator-color", "#5050f7").closest(".list-card").addClass("js-card-separator-wip"); // some shade of blue
-    $(cards).find(".list-card-title:contains('in progress')").css("--card-separator-color", "#5050f7").closest(".list-card").addClass("js-card-separator-wip"); // some shade of blue
+    $(cards).find(".list-card-title:contains('done')").closest(".list-card").addClass("js-card-separator-done");
+    $(cards).find(".list-card-title:contains('todo')").closest(".list-card").addClass("js-card-separator-todo");
+    $(cards).find(".list-card-title:contains('started')").closest(".list-card").addClass("js-card-separator-wip");
+    $(cards).find(".list-card-title:contains('in progress')").closest(".list-card").addClass("js-card-separator-wip");
 
     dividers_card_titles.closest(".list-card").addClass("js-card-separator");
     dividers_card_titles.each(function() {
@@ -46,6 +46,9 @@ function replaceSeparatorsTick()
     // mark todo cards
     $(".js-todo-card").removeClass("js-todo-card");
     $(".js-card-separator-todo").nextAll().addClass("js-todo-card");
+
+    // Mark about column
+    $(".list-header-name:contains('ABOUT')").closest(".list").addClass("js-about-list");
 }
 
 function updateDueDateButtonLabel() {
@@ -108,9 +111,10 @@ function toggleDueDateVisibility()
 
     // list separators
     GM_addStyle(`
-    * {
-        --card-separator-color: black;
-    }
+    :root { --card-separator-color: black; }
+    .js-card-separator-done { --card-separator-color: #0e910e; }
+    .js-card-separator-wip { --card-separator-color: #5050f7; }
+    .js-card-separator-todo { --card-separator-color: #686868; }
 
     .js-card-separator {
         min-height: 35px;
@@ -151,6 +155,7 @@ function toggleDueDateVisibility()
      GM_addStyle(`
      .js-done-card {
          opacity: 50%;
+         font-size: 0.7em;
      }
      .js-done-card .badges, .js-done-card .list-card-members {
          display: none;
@@ -160,6 +165,12 @@ function toggleDueDateVisibility()
          opacity: 80%;
      }
      `);
+
+    // about list
+    GM_addStyle(`
+    .js-about-list { opacity: 50%; }
+    .js-about-list:hover { opacity: 100%; }
+    `);
 
     // Hide strelloids card counter no matter the setting (it's a bit buggy)
     // Reccommendation: Use column limits instead.
@@ -206,6 +217,16 @@ function toggleDueDateVisibility()
     }
     .js-due-date-badge {
         display: var(--js-display-due-badge) !important;
+    }
+    `);
+
+    // alternate list backgrounds
+    GM_addStyle(`
+    .list {
+        background-color: #ffffffab;
+    }
+    .list.exceeds-list-limit {
+        background-color: #ffecabc7;
     }
     `);
 
