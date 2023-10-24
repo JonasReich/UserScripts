@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          Trello Style (Grimlore)
 // @namespace     https://github.com/JonasReich/
-// @version       0.4.2
+// @version       0.5.0
 // @description   Style Adjustments for Trello (for work at Grimlore)
 // @author        Jonas Reich
 // @match         https://trello.com/*
@@ -15,7 +15,7 @@
 // @grant         GM_getValue
 // ==/UserScript==
 
-function replaceSeparatorsTick()
+function updateDynamicTaskListElements()
 {
     // Replace all cards containing the separator string with a card-separator element + Remove the separator string from card text.
     let separator_string = "---";
@@ -35,23 +35,56 @@ function replaceSeparatorsTick()
         $(this).text(str);
     });
 
+    // bug workaround: remove task label every time we add it, otherwise some cards get it by accident when dragging cards around.
+    $(".js-task-card").removeClass("js-task-card");
+
     // mark done cards
     $(".js-done-card").removeClass("js-done-card");
-    $(".js-card-separator-done").nextUntil(".js-card-separator-wip").addClass("js-done-card");
+    $(".js-card-separator-done").nextUntil(".js-card-separator-wip").filter(".list-card").addClass("js-done-card").addClass("js-task-card");
 
     // mark wip cards
     $(".js-wip-card").removeClass("js-wip-card");
-    $(".js-card-separator-wip").nextUntil(".js-card-separator-todo").addClass("js-wip-card");
+    $(".js-card-separator-wip").nextUntil(".js-card-separator-todo").filter(".list-card").addClass("js-wip-card").addClass("js-task-card");
 
     // mark todo cards
     $(".js-todo-card").removeClass("js-todo-card");
-    $(".js-card-separator-todo").nextAll().addClass("js-todo-card");
+    $(".js-card-separator-todo").nextAll().filter(".list-card").addClass("js-todo-card").addClass("js-task-card");
 
     // Mark about column
     $(".list-header-name:contains('ABOUT')").closest(".list").addClass("js-about-list");
 
     // Mark cards labeled with "bug"
     $("button:contains('Bug')").closest(".list-card").not(".js-bug-card").addClass("js-bug-card");
+
+    let task_list_summary_template = `<div class="js-task-list-summary"></div>`;
+    let new_task_lists = $(".js-card-separator-done").closest(".list").not(".js-task-list").addClass("js-task-list");
+    $(new_task_lists).find(".list-header").append(task_list_summary_template);
+    // toggle class: mod-warning
+    let limit_badge_template = `<span class="js-task-limit-badge" title="This is a Grimlore task counter that excludes dividers and 'done' tasks."></span>`;
+    $(new_task_lists).find(".list-header-extras-limit-badge").before(limit_badge_template);
+
+    $(".js-task-list-summary").each(function(){
+        let open_cards = $(this).closest(".list").find(".js-task-card").not(".js-done-card");
+        let remaining_days_prefix = "Remaining Days: ";
+        let num_days = 0;
+        $(open_cards).find(".badge-text").each(function(){
+            let badge_txt = $(this).text();
+            if (badge_txt.includes(remaining_days_prefix)) {
+                let num_days_card = parseInt(badge_txt.replace(remaining_days_prefix, ""));
+                num_days += num_days_card;
+            }
+        });
+        let list_limit_txt = $(this).closest(".js-list").find(".list-header-extras-limit-badge").text();
+        let list_limit = parseInt(list_limit_txt.split("/")[1]);
+
+        let num_open_tasks = open_cards.length;
+        let b_exceeds_limit = num_open_tasks > list_limit;
+        $(this).closest(".list").toggleClass("js-exceeds-task-limit", b_exceeds_limit);
+
+        // html() supports <br> newlines, text() doesn't
+        $(this).html(remaining_days_prefix + num_days);
+        $(this).closest(".list").find(".js-task-limit-badge").text(num_open_tasks + " / " + list_limit).toggleClass("mod-warning", b_exceeds_limit);
+    });
 }
 
 function updateDueDateButtonLabel() {
@@ -169,15 +202,38 @@ function toggleDueDateVisibility()
      }
      `);
 
+    // alternative display for list summary / list limit
+    // hide the default limiter
+    GM_addStyle(`
+    .js-task-list .list-header-extras-limit-badge { display: none; }
+    .js-task-list-summary {
+         color: var(--ds-text-subtlest,#626f86);
+         margin: 0;
+         padding: 0 12px;
+         font-size: 0.7rem;
+    }
+    .js-task-limit-badge {
+        background-color: var(--ds-background-accent-gray-subtler,#dcdfe4);
+        border-radius: 20px;
+        color: var(--ds-text-subtle,#44546f);
+        font-size: 12px;
+        font-weight: 700;
+        font-weight: 400;
+        line-height: 20px;
+        padding: 2px 8px;
+        text-align: center;
+    }
+    .js-task-limit-badge.mod-warning {
+        background-color: var(--ds-background-warning-bold,#e2b203);
+        color: var(--ds-text-warning-inverse,#172b4d);
+    }
+    `);
+
     // about list
     GM_addStyle(`
     .js-about-list { opacity: 50%; }
     .js-about-list:hover { opacity: 100%; }
     `);
-
-    // Hide strelloids card counter no matter the setting (it's a bit buggy)
-    // Reccommendation: Use column limits instead.
-    GM_addStyle(`.list-header-num-cards.js-num-cards {display: none;}`);
 
     // Hide unwanted buttons from card edit window
     GM_addStyle ( `
@@ -223,13 +279,24 @@ function toggleDueDateVisibility()
     }
     `);
 
-    // alternate list backgrounds
+    // alternate list backgrounds...
+    // ...for NON task lists
     GM_addStyle(`
     .list {
-        background-color: #ffffffab;
+        --js-default-background-color: #ffffffab;
+        --js-exceed-limit-background-color: #ffecabc7;
+        background-color: var(--js-default-background-color);
     }
     .list.exceeds-list-limit {
-        background-color: #ffecabc7;
+        background-color: var(--js-exceed-limit-background-color);
+    }`);
+    // ...and for task lists
+    GM_addStyle(`
+    .js-task-list.exceeds-list-limit {
+        background-color: var(--js-default-background-color);
+    }
+    .js-task-list.js-exceeds-task-limit {
+        background-color: var(--js-exceed-limit-background-color);
     }
     `);
 
@@ -239,7 +306,7 @@ function toggleDueDateVisibility()
         border-left: 8px #c9372c solid;
     }`);
 
-    setInterval(replaceSeparatorsTick, 100);
+    setInterval(updateDynamicTaskListElements, 100);
 
     var added_button = false;
     waitForKeyElements("div.board-header-btns", function(){
