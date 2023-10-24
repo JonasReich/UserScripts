@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          Trello Style (Grimlore)
 // @namespace     https://github.com/JonasReich/
-// @version       0.4.1
+// @version       0.4.2
 // @description   Style Adjustments for Trello (for work at Grimlore)
 // @author        Jonas Reich
 // @match         https://trello.com/*
@@ -49,6 +49,9 @@ function replaceSeparatorsTick()
 
     // Mark about column
     $(".list-header-name:contains('ABOUT')").closest(".list").addClass("js-about-list");
+
+    // Mark cards labeled with "bug"
+    $("button:contains('Bug')").closest(".list-card").not(".js-bug-card").addClass("js-bug-card");
 }
 
 function updateDueDateButtonLabel() {
@@ -229,6 +232,12 @@ function toggleDueDateVisibility()
         background-color: #ffecabc7;
     }
     `);
+
+    // bugs
+    GM_addStyle(`
+    .js-bug-card {
+        border-left: 8px #c9372c solid;
+    }`);
 
     setInterval(replaceSeparatorsTick, 100);
 
