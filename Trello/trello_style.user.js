@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          Trello Style (Grimlore)
 // @namespace     https://github.com/JonasReich/
-// @version       0.5.0
+// @version       0.6.0
 // @description   Style Adjustments for Trello (for work at Grimlore)
 // @author        Jonas Reich
 // @match         https://trello.com/*
@@ -20,7 +20,7 @@ function updateDynamicTaskListElements()
     // Replace all cards containing the separator string with a card-separator element + Remove the separator string from card text.
     let separator_string = "---";
     let dividers_card_titles = $(`.list-card-title:contains('${separator_string}')`);
-    let cards = dividers_card_titles.closest(".list-card");
+    let cards = dividers_card_titles.closest(".list-card").not(".placeholder");
     $(cards).find(".list-card-title:contains('done')").closest(".list-card").addClass("js-card-separator-done");
     $(cards).find(".list-card-title:contains('todo')").closest(".list-card").addClass("js-card-separator-todo");
     $(cards).find(".list-card-title:contains('started')").closest(".list-card").addClass("js-card-separator-wip");
@@ -40,15 +40,15 @@ function updateDynamicTaskListElements()
 
     // mark done cards
     $(".js-done-card").removeClass("js-done-card");
-    $(".js-card-separator-done").nextUntil(".js-card-separator-wip").filter(".list-card").addClass("js-done-card").addClass("js-task-card");
+    $(".js-card-separator-done").nextUntil(".js-card-separator-wip").filter(".list-card").not(".placeholder").addClass("js-done-card").addClass("js-task-card");
 
     // mark wip cards
     $(".js-wip-card").removeClass("js-wip-card");
-    $(".js-card-separator-wip").nextUntil(".js-card-separator-todo").filter(".list-card").addClass("js-wip-card").addClass("js-task-card");
+    $(".js-card-separator-wip").nextUntil(".js-card-separator-todo").filter(".list-card").not(".placeholder").addClass("js-wip-card").addClass("js-task-card");
 
     // mark todo cards
     $(".js-todo-card").removeClass("js-todo-card");
-    $(".js-card-separator-todo").nextAll().filter(".list-card").addClass("js-todo-card").addClass("js-task-card");
+    $(".js-card-separator-todo").nextAll().filter(".list-card").not(".placeholder").addClass("js-todo-card").addClass("js-task-card");
 
     // Mark about column
     $(".list-header-name:contains('ABOUT')").closest(".list").addClass("js-about-list");
@@ -107,6 +107,26 @@ function toggleDueDateVisibility()
     updateDueDateButtonLabel();
 }
 
+function updateDoneTasksButtonLabel() {
+    let show = GM_getValue(KEY_SHOW_DONE);
+    let btn_text = (show == "none") ? "🙈 Done Tasks" : "👀 Done Tasks";
+    $("#toggle-done-visibility-button-label").text(btn_text);
+}
+
+var KEY_SHOW_DONE = "trello-show-done-tasks";
+function toggleDoneTasksVisibility()
+{
+    let display_status = $(":root").css("--js-display-done-tasks");
+    if (display_status == "none") {
+        display_status = "inline-block";
+    } else {
+        display_status = "none";
+    }
+    GM_setValue(KEY_SHOW_DONE, display_status);
+    $(":root").css("--js-display-done-tasks", display_status);
+    updateDoneTasksButtonLabel();
+}
+
 (function() {
     'use strict';
 
@@ -114,12 +134,6 @@ function toggleDueDateVisibility()
     // Make compatible with column limits
     // Make lists wider than default -> change images to contain instead of cover
     GM_addStyle ( `
-    .list-wrapper {
-        /*width: 350px;*/
-    }
-    .list-wrapper:first-of-type {
-        /*width: auto;*/
-    }
     .js-add-list.list-wrapper.mod-add.is-idle {
         width: max-content;
     }
@@ -270,12 +284,31 @@ function toggleDueDateVisibility()
     }
     `);
 
+    // custom toolbar buttons (main button bar on board)
+    GM_addStyle(`
+    .js-custom-toolbar-button {
+        background-color: var(--dynamic-button);
+        color: var(--dynamic-text);
+    }
+    .js-custom-toolbar-button:hover {
+        background-color: var(--dynamic-button-hovered);
+    }
+    `);
+
+    // due toggling
     GM_addStyle(`
     :root {
         --js-display-due-badge: inline-block;
     }
     .js-due-date-badge {
         display: var(--js-display-due-badge) !important;
+    }
+    `);
+
+    // done task toggling
+    GM_addStyle(`
+    .js-done-card {
+        display: var(--js-display-done-tasks);
     }
     `);
 
@@ -308,22 +341,37 @@ function toggleDueDateVisibility()
 
     setInterval(updateDynamicTaskListElements, 100);
 
-    var added_button = false;
+    // ---
+
+    var added_due_button = false;
+    var added_done_vis_button = false;
     waitForKeyElements("div.board-header-btns", function(){
-        if (!added_button)
+        if (!added_due_button)
         {
-            let button_template = `<div><div><div role="presentation"><button id="toggle-due-visibility-button" type="button" aria-label="Toggle Due Date Visibility" aria-describedby="36val-tooltip"><span id="toggle-due-visibility-button-label">Toggle Due Dates</span></button></div></div></div>`;
-            $(".board-header-btns").append(button_template);
+            let due_button_template = `<div><div><div role="presentation"><button id="toggle-due-visibility-button" class="js-custom-toolbar-button" type="button" aria-label="Toggle Due Date Visibility" aria-describedby="36val-tooltip"><span id="toggle-due-visibility-button-label" title="Toggle Due Dates"></span></button></div></div></div>`;
+            $(".board-header-btns").append(due_button_template);
             $("#toggle-due-visibility-button").click(function(){toggleDueDateVisibility();});
             updateDueDateButtonLabel();
+
+            let done_button_template = `<div><div><div role="presentation"><button id="toggle-done-tasks-button" class="js-custom-toolbar-button" type="button" aria-label="Toggle Done Tasks Visibility" aria-describedby="36val-tooltip"><span id="toggle-done-visibility-button-label" title="Toggle Done Tasks"></span></button></div></div></div>`;
+            $(".board-header-btns").append(done_button_template);
+            $("#toggle-done-tasks-button").click(function(){toggleDoneTasksVisibility();});
+            updateDoneTasksButtonLabel();
         }
-        added_button = true;
+        added_due_button = true;
     });
 
     let due_visibility = GM_getValue(KEY_SHOW_DUES);
     if (due_visibility != undefined) {
         $(":root").css("--js-display-due-badge", due_visibility);
     } else {
-        GM_setValue("inline-block");
+        GM_setValue(KEY_SHOW_DUES, "inline-block");
+    }
+
+    let done_visibility = GM_getValue(KEY_SHOW_DONE);
+    if (done_visibility != undefined) {
+        $(":root").css("--js-display-done-tasks", done_visibility);
+    } else {
+        GM_setValue(KEY_SHOW_DONE, "inline-block");
     }
 })();
