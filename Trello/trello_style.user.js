@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          Trello Style (Grimlore)
 // @namespace     https://github.com/JonasReich/
-// @version       0.7.0
+// @version       0.8.0
 // @description   Style Adjustments for Trello (for work at Grimlore)
 // @author        Jonas Reich
 // @match         https://trello.com/*
@@ -21,6 +21,7 @@ function updateDynamicTaskListElements()
 {
     // before 26-10-2023 these elements were identified by classes. now they have data which we can't easily query for in css (I think?).
     // So I replace them with custom js-... classes.
+    $("[data-testid='header-container']").addClass("js-header-container");
     $("[data-testid='card-name']").addClass("js-list-card-title");
     $('[data-testid="list"]').addClass("js-list");
     $('[data-testid="list-card"]').addClass('js-list-card');
@@ -31,6 +32,7 @@ function updateDynamicTaskListElements()
     $('[data-testid="list-name"]').addClass("js-list-name");
     $('[data-testid="list-limits-badge"]').addClass("js-list-limits-badge");
     $('[data-testid="card-front-member"]').addClass("js-card-front-member");
+    $('[data-testid="card-front-badges"]').addClass("js-card-front-badges");
     $('[data-testid="badge-custom-field"]').addClass("js-badge-custom-field");
 
     // Replace all cards containing the separator string with a card-separator element + Remove the separator string from card text.
@@ -41,6 +43,7 @@ function updateDynamicTaskListElements()
     $(cards).find(".js-list-card-title:contains('todo')").closest(".js-list-card").addClass("js-card-separator-todo");
     $(cards).find(".js-list-card-title:contains('started')").closest(".js-list-card").addClass("js-card-separator-wip");
     $(cards).find(".js-list-card-title:contains('in progress')").closest(".js-list-card").addClass("js-card-separator-wip");
+    $(cards).find(".js-list-card-title:contains('backlog')").closest(".js-list-card").addClass("js-card-separator-backlog");
 
     dividers_card_titles.closest(".js-list-card").addClass("js-card-separator");
     dividers_card_titles.each(function() {
@@ -64,7 +67,11 @@ function updateDynamicTaskListElements()
 
     // mark todo cards
     $(".js-todo-card").removeClass("js-todo-card");
-    $(".js-card-separator-todo").nextAll().filter(".js-list-card").not(".placeholder").addClass("js-todo-card").addClass("js-task-card");
+    $(".js-card-separator-todo").nextUntil(".js-card-separator-backlog").filter(".js-list-card").not(".placeholder").addClass("js-todo-card").addClass("js-task-card");
+
+    // mark backlog cards
+    $(".js-backlog-card").removeClass("js-backlog-card");
+    $(".js-card-separator-backlog").nextAll().filter(".js-list-card").not(".placeholder").addClass("js-backlog-card").addClass("js-task-card");
 
     // Mark about column
     $(".js-list-name:contains('ABOUT')").closest(".js-list").addClass("js-about-list");
@@ -203,10 +210,25 @@ function toggleDoneTasksVisibility()
 
     // list separators
     GM_addStyle(`
-    :root { --card-separator-color: black; }
-    .js-card-separator-done { --card-separator-color: #0e910e; }
-    .js-card-separator-wip { --card-separator-color: #5050f7; }
-    .js-card-separator-todo { --card-separator-color: #686868; }
+    :root {
+        --card-separator-color: black;
+        --status-color-done: #0e910e;
+        --status-color-wip: #5050f7;
+        --status-color-todo: #686868;
+    }
+    .js-card-separator-done { --card-separator-color: var(--status-color-done); }
+    .js-card-separator-wip { --card-separator-color: var(--status-color-wip); }
+    .js-card-separator-todo { --card-separator-color: var(--status-color-todo); }
+    .js-card-separator-backlog { --card-separator-color: var(--status-color-todo); }
+
+    .js-task-card { --status-color: transparent; }
+    .js-done-card { --status-color: var(--status-color-done); }
+    .js-wip-card { --status-color: var(--status-color-wip); }
+    .js-todo-card { --status-color: var(--status-color-todo); }
+
+    .js-list-card {
+        padding-bottom: 3px !important;
+    }
 
     .js-card-separator {
         border-radius: 0px;
@@ -254,13 +276,29 @@ function toggleDoneTasksVisibility()
 
     // done/wip/todo cards
      GM_addStyle(`
+     .js-task-card > * {
+         border-radius: 0px !important;
+         border-left: 4px var(--status-color) solid;
+     }
      .js-done-card {
-         opacity: 50%;
-         font-size: 0.7em;
          display: var(--js-display-done-tasks) !important;
      }
-     .js-done-card .badges, .js-done-card .js-card-front-member {
-         display: none;
+     .js-done-card, .js-backlog-card
+     {
+         opacity: 50%;
+     }
+     .js-done-card *, .js-backlog-card * {
+         font-size: 0.91em !important;
+         line-height: 1.5em;
+         height: inherit;
+     }
+     .js-done-card .badges,
+     .js-done-card .js-card-front-badges,
+     .js-backlog-card .badges,
+     .js-backlog-card .js-card-front-badges,
+     .js-task-card .js-card-front-member
+     {
+         display: none !important;
      }
 
      .js-todo-card {
@@ -352,12 +390,6 @@ function toggleDoneTasksVisibility()
         --list-background: var(--js-exceed-limit-background-color)) !important;
     }
     `);
-
-    // bugs
-    GM_addStyle(`
-    .js-bug-card .js-trello-card {
-        border-left: 8px #c9372c solid;
-    }`);
 
     setInterval(updateDynamicTaskListElements, 100);
 
