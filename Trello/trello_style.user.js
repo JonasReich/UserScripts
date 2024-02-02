@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          Trello Style (Grimlore)
 // @namespace     https://github.com/JonasReich/
-// @version       0.8.0
+// @version       0.9.0
 // @description   Style Adjustments for Trello (for work at Grimlore)
 // @author        Jonas Reich
 // @match         https://trello.com/*
@@ -150,6 +150,20 @@ function toggleDoneTasksVisibility()
     updateDoneTasksButtonLabel();
 }
 
+function updateMinifyButtonLabel() {
+    let minify_status = $(":root").hasClass("js-minify");
+    let btn_text = minify_status ? "🐘 Maxify" : "🐁 Minify";
+    $("#toggle-minify-button-label").text(btn_text);
+}
+
+function toggleMinify()
+{
+    let minify_status = $(":root").hasClass("js-minify");
+    minify_status = !minify_status;
+    $(":root").toggleClass("js-minify", minify_status);
+    updateMinifyButtonLabel();
+}
+
 (function() {
 
     // Make collapsed lists smaller
@@ -290,7 +304,6 @@ function toggleDoneTasksVisibility()
      .js-done-card *, .js-backlog-card * {
          font-size: 0.91em !important;
          line-height: 1.5em;
-         height: inherit;
      }
      .js-done-card .badges,
      .js-done-card .js-card-front-badges,
@@ -303,6 +316,34 @@ function toggleDoneTasksVisibility()
 
      .js-todo-card {
          opacity: 80%;
+     }
+     .js-done-card [data-testid="compact-card-label"][data-expanded="false"],
+     .js-backlog-card [data-testid="compact-card-label"][data-expanded="false"] {
+         height: 3px;
+     }
+
+     .js-minify .js-card-front-badges {
+	     display: none;
+     }
+
+     /* minification */
+     .js-minify .js-list-card-title {
+     	text-overflow: ellipsis;
+     	white-space: nowrap;
+     }
+     .js-minify .js-list-card:hover .js-list-card-title {
+	     white-space: inherit;
+     }
+     .js-minify .js-header-container,
+     .js-minify [data-testid="workspace-navigation-nav"],
+     .js-minify .js-board-header :not(:has(#toggle-minify-button)),
+     .js-minify .js-board-header > * > * > :nth-of-type(1)
+     {
+         display: none;
+     }
+     #toggle-minify-button, #toggle-minify-button *
+     {
+         display: inherit !important;
      }
      `);
 
@@ -409,6 +450,11 @@ function toggleDoneTasksVisibility()
             $(".board-header-btns").append(done_button_template);
             $("#toggle-done-tasks-button").click(function(){toggleDoneTasksVisibility();});
             updateDoneTasksButtonLabel();
+
+            let minify_button_template = `<div><div><div role="presentation"><button id="toggle-minify-button" class="js-custom-toolbar-button" type="button" aria-label="Toggle Minify" aria-describedby="36val-tooltip"><span id="toggle-minify-button-label" title="Toggle Minify"></span></button></div></div></div>`;
+            $(".board-header-btns").append(minify_button_template);
+            $("#toggle-minify-button").click(function(){toggleMinify();});
+            updateMinifyButtonLabel();
         }
         added_due_button = true;
     });
