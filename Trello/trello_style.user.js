@@ -336,12 +336,12 @@ function toggleMinify()
      }
      .js-minify .js-header-container,
      .js-minify [data-testid="workspace-navigation-nav"],
-     .js-minify .js-board-header :not(:has(#toggle-minify-button)),
+     .js-minify .js-board-header :not(:has(.js-custom-toolbar-button)),
      .js-minify .js-board-header > * > * > :nth-of-type(1)
      {
          display: none;
      }
-     #toggle-minify-button, #toggle-minify-button *
+     .js-custom-toolbar-button, .js-custom-toolbar-button *
      {
          display: inherit !important;
      }
