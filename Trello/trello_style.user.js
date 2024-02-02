@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          Trello Style (Grimlore)
 // @namespace     https://github.com/JonasReich/
-// @version       0.9.0
+// @version       0.9.1
 // @description   Style Adjustments for Trello (for work at Grimlore)
 // @author        Jonas Reich
 // @match         https://trello.com/*
@@ -165,63 +165,6 @@ function toggleMinify()
 }
 
 (function() {
-
-    // Make collapsed lists smaller
-    // Make compatible with column limits
-    // Make lists wider than default -> change images to contain instead of cover
-    /*
-    GM_addStyle ( `
-    .js-add-list.list-wrapper.mod-add.is-idle {
-        width: max-content;
-    }
-    .list-wrapper.list-hidden {
-        height: inherit;
-    }
-    .list-card { max-width: none; }
-    #board:not(.board-table-view) .list-hidden .list-header .list-header-extras {
-        top: 30px;
-        left: 5px;
-    }
-    #board:not(.board-table-view) .list-hidden .list-header-name-assist {
-        margin-top: 100px;
-    }
-    .list-card.is-covered .list-card-cover {
-        background-size: contain !important;
-        max-height: 100px;
-    }
-    #board:not(.board-table-view) .list-hidden .list-header-extras-limit-badge {
-        padding: 8px 2px;
-        margin-left: 3px;
-        margin-bottom: 3px;
-    }
-    `);
-    */
-
-    // Make card details window bigger (useful on 1440k and bigger monitors)
-    /*
-    GM_addStyle ( `
-    .window { width: 80%; max-width:1400px; }
-    .window-main-col { width: 68%; padding: 0 1% 1% 2%; }
-    .window-sidebar { width: 25%; }
-    .small-window .window-sidebar { position: static; }
-    .window-sidebar .button-link, .card-detail-window .button-link-container {
-        max-width: none;
-        width: 45%;
-        display: inline-block;
-        margin: 1px;
-    }
-    .js-butler-card-buttons .u-clearfix .u-clearfix div {
-        display: inline;
-    }
-    .checklist-item-details .checklist-item-row .checklist-item-text-and-controls {
-        padding: 2px 0px;
-    }
-    .window-module, .checklist {
-        margin-bottom:0;
-    }
-    `);
-    */
-
     // list separators
     GM_addStyle(`
     :root {
@@ -337,7 +280,8 @@ function toggleMinify()
      .js-minify .js-header-container,
      .js-minify [data-testid="workspace-navigation-nav"],
      .js-minify .js-board-header :not(:has(.js-custom-toolbar-button)),
-     .js-minify .js-board-header > * > * > :nth-of-type(1)
+     .js-minify .js-board-header > * > * > :nth-of-type(1),
+     .js-minify [data-testid="card-front-cover"][data-card-front-section="cover"]
      {
          display: none;
      }
