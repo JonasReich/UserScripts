@@ -84,9 +84,6 @@ function updateDynamicTaskListElements()
     let task_list_summary_template = `<div class="js-task-list-summary"></div>`;
     let new_task_lists = $(".js-card-separator-done").closest(".js-list").not(".js-task-list").addClass("js-task-list");
     $(new_task_lists).find(".js-list-header").append(task_list_summary_template);
-    // toggle class: mod-warning
-    let limit_badge_template = `<span class="js-task-limit-badge" title="This is a Grimlore task counter that excludes dividers and 'done' tasks."></span>`;
-    $(".js-task-list .js-list-header:not(:has(.js-task-limit-badge))").find(".js-list-limits-badge").before(limit_badge_template);
 
     $(".js-task-list-summary").each(function(){
         let open_cards = $(this).closest(".js-list").find(".js-task-card").not(".js-done-card");
@@ -99,16 +96,8 @@ function updateDynamicTaskListElements()
                 num_days += num_days_card;
             }
         });
-        let list_limit_txt = $(this).closest(".js-list").find(".js-list-limits-badge").text();
-        let list_limit = parseInt(list_limit_txt.split("/")[1]);
-
-        let num_open_tasks = open_cards.length;
-        let b_exceeds_limit = num_open_tasks > list_limit;
-        $(this).closest(".js-list").toggleClass("js-exceeds-task-limit", b_exceeds_limit);
-
         // html() supports <br> newlines, text() doesn't
-        $(this).html(remaining_days_prefix + num_days);
-        $(this).closest(".js-list").find(".js-task-limit-badge").text(num_open_tasks + " / " + list_limit).toggleClass("mod-warning", b_exceeds_limit);
+        $(this).html("Open Tasks: " + open_cards.length + "<br>" + remaining_days_prefix + num_days);
     });
 }
 
@@ -253,8 +242,10 @@ function toggleMinify()
      .js-minify .js-card-front-badges {
 	     display: none;
      }
+    `);
 
-     /* minification */
+     // minification
+     GM_addStyle(`
      .js-minify .js-list-card-title {
      	text-overflow: ellipsis;
      	white-space: nowrap;
@@ -281,32 +272,14 @@ function toggleMinify()
     @media (prefers-color-scheme: dark) { .js-task-blocked > * { background-color: #4f1c1c !important; } }
     `);
 
-    // alternative display for list summary / list limit
-    // hide the default limiter
+    // cusotm list summary
     GM_addStyle(`
-    .js-task-list .js-list-limits-badge { display: none; }
     .js-task-list-summary {
          color: var(--ds-text-subtlest,#626f86);
          margin: 0;
          padding: 0 12px;
          font-size: 0.7rem;
          padding-bottom: .5rem;
-    }
-    .js-task-limit-badge {
-        background-color: var(--ds-background-accent-gray-subtler,#dcdfe4);
-        border-radius: 20px;
-        color: var(--ds-text-subtle,#44546f);
-        font-size: 12px;
-        font-weight: 700;
-        font-weight: 400;
-        line-height: 20px;
-        margin: 4px 0;
-        padding: 2px 8px;
-        text-align: center;
-    }
-    .js-task-limit-badge.mod-warning {
-        background-color: var(--ds-background-warning-bold,#e2b203);
-        color: var(--ds-text-warning-inverse,#172b4d);
     }
     `);
 
