@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          Trello Style (Grimlore)
 // @namespace     https://github.com/JonasReich/
-// @version       0.9.1
+// @version       0.9.0
 // @description   Style Adjustments for Trello (for work at Grimlore)
 // @author        Jonas Reich
 // @match         https://trello.com/*
@@ -44,6 +44,8 @@ function updateDynamicTaskListElements()
     $(cards).find(".js-list-card-title:contains('started')").closest(".js-list-card").addClass("js-card-separator-wip");
     $(cards).find(".js-list-card-title:contains('in progress')").closest(".js-list-card").addClass("js-card-separator-wip");
     $(cards).find(".js-list-card-title:contains('backlog')").closest(".js-list-card").addClass("js-card-separator-backlog");
+
+    $(`.js-list-card-title:contains('[blocked]')`).closest(".js-list-card").addClass("js-task-blocked");
 
     dividers_card_titles.closest(".js-list-card").addClass("js-card-separator");
     dividers_card_titles.each(function() {
@@ -198,10 +200,12 @@ function toggleMinify()
         padding: 0;
     }
 
+    .js-card-separator > div > div > div:nth-of-type(1) {
+        display: none;
+    }
+
     .js-card-separator .js-list-card-title {
-        color: var(--card-separator-color) !important;
-        font-weight: 600;
-        font-size: 1.1rem;
+        font-size: 1.1rem !important;
         text-align: center;
         font-variant: all-small-caps;
         padding-bottom: 10px;
@@ -210,31 +214,12 @@ function toggleMinify()
     .js-card-separator .list-card-details {
         padding: 0;
     }
-
-    .js-card-separator .js-list-card-title::before, .js-card-separator .js-list-card-title::after {
-        content: "";
-        flex-grow: 1;
-        display: inline;
-        border-bottom: 2px solid;
-        margin-left: 5px;
-        margin-right: 5px;
-        height: 12px;
-    }
-
-    .js-card-separator .js-list-card-title {
-        display: flex;
-    }
-
-    .js-card-separator * {
-       background-color: transparent !important;
-       box-shadow: none !important;
-    }
     `);
 
     // done/wip/todo cards
      GM_addStyle(`
+     * { border-radius: 4px !important; }
      .js-task-card > * {
-         border-radius: 0px !important;
          border-left: 4px var(--status-color) solid;
      }
      .js-done-card {
@@ -291,6 +276,11 @@ function toggleMinify()
      }
      `);
 
+    GM_addStyle(`
+    .js-task-blocked > * { background-color: #ff9d86 !important; }
+    @media (prefers-color-scheme: dark) { .js-task-blocked > * { background-color: #4f1c1c !important; } }
+    `);
+
     // alternative display for list summary / list limit
     // hide the default limiter
     GM_addStyle(`
@@ -318,8 +308,6 @@ function toggleMinify()
         background-color: var(--ds-background-warning-bold,#e2b203);
         color: var(--ds-text-warning-inverse,#172b4d);
     }
-    /*hide member on task cards. they are sorted into columns by assignee anyways
-    .js-task-list .js-card-front-member { display:none; }*/
     `);
 
     // about list
@@ -361,10 +349,6 @@ function toggleMinify()
         /* copied from trello with eye-picker */
         --js-default-background-color: rgb(241, 242, 244);
         --js-exceed-limit-background-color: rgb(255, 247, 214);
-        /*--list-background: var(--js-default-background-color) !important;*/
-    }
-    .js-list.exceeds-list-limit {
-        /*--list-background: var(--js-exceed-limit-background-color) !important;*/
     }`);
     // ...and for task lists
     GM_addStyle(`
