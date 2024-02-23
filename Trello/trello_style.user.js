@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          Trello Style (Grimlore)
 // @namespace     https://github.com/JonasReich/
-// @version       0.10.0
+// @version       0.10.1
 // @description   Style Adjustments for Trello (for work at Grimlore)
 // @author        Jonas Reich
 // @match         https://trello.com/*
@@ -182,7 +182,6 @@ function toggleMinify()
         border-radius: 0px;
         background-color: transparent !important;
         box-shadow: none;
-        height: 40px;
     }
 
     .js-card-separator > div > div {
