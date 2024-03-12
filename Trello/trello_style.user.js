@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          Trello Style (Grimlore)
 // @namespace     https://github.com/JonasReich/
-// @version       0.10.1
+// @version       0.10.2
 // @description   Style Adjustments for Trello (for work at Grimlore)
 // @author        Jonas Reich
 // @match         https://trello.com/*
@@ -279,6 +279,7 @@ function toggleMinify()
          padding: 0 12px;
          font-size: 0.7rem;
          padding-bottom: .5rem;
+	 width: 100%;
     }
     `);
 
