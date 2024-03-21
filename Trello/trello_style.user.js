@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          Trello Style (Grimlore)
 // @namespace     https://github.com/JonasReich/
-// @version       0.10.2
+// @version       0.10.3
 // @description   Style Adjustments for Trello (for work at Grimlore)
 // @author        Jonas Reich
 // @match         https://trello.com/*
@@ -82,7 +82,7 @@ function updateDynamicTaskListElements()
     $("button:contains('Bug')").closest(".js-list-card").not(".js-bug-card").addClass("js-bug-card");
 
     let task_list_summary_template = `<div class="js-task-list-summary"></div>`;
-    let new_task_lists = $(".js-card-separator-done").closest(".js-list").not(".js-task-list").addClass("js-task-list");
+    let new_task_lists = $(".js-card-separator-done").closest(".js-list").not(":has(.js-task-list-summary)").addClass("js-task-list");
     $(new_task_lists).find(".js-list-header").append(task_list_summary_template);
 
     $(".js-task-list-summary").each(function(){
