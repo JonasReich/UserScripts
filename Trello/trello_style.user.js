@@ -241,6 +241,10 @@ function toggleMinify()
      .js-minify .js-card-front-badges {
 	     display: none;
      }
+
+     .js-trello-card:has([data-testid="compact-card-label"][aria-label*="Key Feature"]) {
+         border-right: 4px #e2b203 solid;
+     }
     `);
 
      // minification
