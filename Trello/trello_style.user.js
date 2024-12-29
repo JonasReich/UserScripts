@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          Trello Style (Grimlore)
 // @namespace     https://github.com/JonasReich/
-// @version       0.10.4
+// @version       0.11.0
 // @description   Style Adjustments for Trello (for work at Grimlore)
 // @author        Jonas Reich
 // @match         https://trello.com/*
@@ -101,58 +101,24 @@ function updateDynamicTaskListElements()
     });
 }
 
-function updateDueDateButtonLabel() {
-    let show = GM_getValue(KEY_SHOW_DUES);
-    let btn_text = (show == "none") ? "🙈 Due Dates" : "👀 Due Dates";
-    $("#toggle-due-visibility-button-label").text(btn_text);
+function updateBadgesButtonLabel() {
+    let show = GM_getValue(KEY_SHOW_BADGES);
+    let btn_text = (show == "none") ? "🙈 Badges" : "👀 Badges";
+    $("#toggle-badge-visibility-button-label").text(btn_text);
 }
 
-var KEY_SHOW_DUES = "trello-show-due-dates";
-function toggleDueDateVisibility()
+var KEY_SHOW_BADGES = "trello-show-badges";
+function togleBadgesVisibility()
 {
-    let display_status = $(":root").css("--js-display-due-badge");
+    let display_status = $(":root").css("--js-display-badges");
     if (display_status == "none") {
         display_status = "flex";
     } else {
         display_status = "none";
     }
-    GM_setValue(KEY_SHOW_DUES, display_status);
-    $(":root").css("--js-display-due-badge", display_status);
-    updateDueDateButtonLabel();
-}
-
-function updateDoneTasksButtonLabel() {
-    let show = GM_getValue(KEY_SHOW_DONE);
-    let btn_text = (show == "none") ? "🙈 Done Tasks" : "👀 Done Tasks";
-    $("#toggle-done-visibility-button-label").text(btn_text);
-}
-
-var KEY_SHOW_DONE = "trello-show-done-tasks";
-function toggleDoneTasksVisibility()
-{
-    let display_status = $(":root").css("--js-display-done-tasks");
-    if (display_status == "none") {
-        display_status = "flex";
-    } else {
-        display_status = "none";
-    }
-    GM_setValue(KEY_SHOW_DONE, display_status);
-    $(":root").css("--js-display-done-tasks", display_status);
-    updateDoneTasksButtonLabel();
-}
-
-function updateMinifyButtonLabel() {
-    let minify_status = $(":root").hasClass("js-minify");
-    let btn_text = minify_status ? "🐘 Maxify" : "🐁 Minify";
-    $("#toggle-minify-button-label").text(btn_text);
-}
-
-function toggleMinify()
-{
-    let minify_status = $(":root").hasClass("js-minify");
-    minify_status = !minify_status;
-    $(":root").toggleClass("js-minify", minify_status);
-    updateMinifyButtonLabel();
+    GM_setValue(KEY_SHOW_BADGES, display_status);
+    $(":root").css("--js-display-badges", display_status);
+    updateBadgesButtonLabel();
 }
 
 (function() {
@@ -309,13 +275,13 @@ function toggleMinify()
     }
     `);
 
-    // due toggling
+    // badges toggling
     GM_addStyle(`
     :root {
-        --js-display-due-badge: inline-block;
+        --js-display-badges: inline-block;
     }
-    .js-due-date-badge {
-        display: var(--js-display-due-badge) !important;
+    .js-card-front-badges, .js-header-container {
+        display: var(--js-display-badges) !important;
     }
     `);
 
@@ -341,40 +307,22 @@ function toggleMinify()
 
     // ---
 
-    var added_due_button = false;
-    var added_done_vis_button = false;
+    var added_badges_toggle_button = false;
     waitForKeyElements("div.board-header-btns", function(){
-        if (!added_due_button)
+        if (!added_badges_toggle_button)
         {
-            let due_button_template = `<div><div><div role="presentation"><button id="toggle-due-visibility-button" class="js-custom-toolbar-button" type="button" aria-label="Toggle Due Date Visibility" aria-describedby="36val-tooltip"><span id="toggle-due-visibility-button-label" title="Toggle Due Dates"></span></button></div></div></div>`;
-            $(".board-header-btns").append(due_button_template);
-            $("#toggle-due-visibility-button").click(function(){toggleDueDateVisibility();});
-            updateDueDateButtonLabel();
-
-            let done_button_template = `<div><div><div role="presentation"><button id="toggle-done-tasks-button" class="js-custom-toolbar-button" type="button" aria-label="Toggle Done Tasks Visibility" aria-describedby="36val-tooltip"><span id="toggle-done-visibility-button-label" title="Toggle Done Tasks"></span></button></div></div></div>`;
-            $(".board-header-btns").append(done_button_template);
-            $("#toggle-done-tasks-button").click(function(){toggleDoneTasksVisibility();});
-            updateDoneTasksButtonLabel();
-
-            let minify_button_template = `<div><div><div role="presentation"><button id="toggle-minify-button" class="js-custom-toolbar-button" type="button" aria-label="Toggle Minify" aria-describedby="36val-tooltip"><span id="toggle-minify-button-label" title="Toggle Minify"></span></button></div></div></div>`;
-            $(".board-header-btns").append(minify_button_template);
-            $("#toggle-minify-button").click(function(){toggleMinify();});
-            updateMinifyButtonLabel();
+            let badge_toggle_btn_template = `<div><div><div role="presentation"><button id="toggle-badge-visibility-button" class="js-custom-toolbar-button" type="button" aria-label="Toggle Badge Visibility" aria-describedby="36val-tooltip"><span id="toggle-badge-visibility-button-label" title="BUTTON TEMPLATE"></span></button></div></div></div>`;
+            $(".board-header-btns").append(badge_toggle_btn_template);
+            $("#toggle-badge-visibility-button").click(function(){togleBadgesVisibility();});
+            updateBadgesButtonLabel();
         }
-        added_due_button = true;
+        added_badges_toggle_button = true;
     });
 
-    let due_visibility = GM_getValue(KEY_SHOW_DUES);
-    if (due_visibility == "flex" || due_visibility == "none") {
-        $(":root").css("--js-display-due-badge", due_visibility);
+    let badge_visibility = GM_getValue(KEY_SHOW_BADGES);
+    if (badge_visibility == "flex" || badge_visibility == "none") {
+        $(":root").css("--js-display-badges", badge_visibility);
     } else {
-        GM_setValue(KEY_SHOW_DUES, "flex");
-    }
-
-    let done_visibility = GM_getValue(KEY_SHOW_DONE);
-    if (done_visibility == "flex" || done_visibility == "none") {
-        $(":root").css("--js-display-done-tasks", done_visibility);
-    } else {
-        GM_setValue(KEY_SHOW_DONE, "flex");
+        GM_setValue(KEY_SHOW_BADGES, "flex");
     }
 })();
